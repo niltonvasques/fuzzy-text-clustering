@@ -1,0 +1,7 @@
+*.swp
+*.swo
+in
+ranking.cluste*
+discover.*
+*.matrix
+clustering
