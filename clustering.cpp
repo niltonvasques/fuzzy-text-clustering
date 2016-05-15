@@ -76,8 +76,8 @@ int main(int argc, char *argv[]){
   b = arguments.a;
   fuzziness = fuzziness_m = arguments.m;
   fuzziness_n = arguments.n;
-  int max_clusters = arguments.c;
-  int random_initials = arguments.r;
+  uint max_clusters = arguments.c;
+  uint random_initials = arguments.r;
 
   //if(!arguments.input) {
   //  printf("--input FILE is required.\n");
@@ -108,9 +108,9 @@ int main(int argc, char *argv[]){
 
   double max_fs = -2;
   double fs;
-  int max_groups = 2;
+  uint max_groups = 2;
   printf("find optimal cluster number from 2 to %d\n", max_clusters);
-  for(int i = 2; i <= max_clusters; i++){
+  for(uint i = 2; i <= max_clusters; i++){
     printf("computing clustering with %d groups\n", i);
     num_clusters = i;
     times(j, random_initials){

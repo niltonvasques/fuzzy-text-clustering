@@ -5,7 +5,7 @@
 #include "fcm.h"
 
 static inline void pfcm_compute_prototypes() {
-  int i, j, k;
+  uint i, j, k;
   double numerator, denominator;
   vector<double> t[num_docs];
   for (i = 0; i < num_docs; i++) {
@@ -28,7 +28,7 @@ static inline void pfcm_compute_prototypes() {
   }
 }
 
-static inline double pfcm_tipicality(double distance, int j){
+static inline double pfcm_tipicality(double distance, uint j){
   double denominator = distance / gamas[j];
   double exp = 1.0 / (fuzziness_n - 1.0);
   denominator = 1.0 + pow(denominator, exp);
@@ -36,7 +36,7 @@ static inline double pfcm_tipicality(double distance, int j){
 }
 
 static inline double pfcm_update_memberships_and_tipicalities() {
-  int i, j;
+  uint i, j;
   double new_uij;
   double new_tik;
   double sum_kn = 0;

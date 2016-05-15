@@ -3,7 +3,7 @@
 #include "shared.h"
 
 static inline void pcm_compute_prototypes() {
-    int i, j, k;
+    uint i, j, k;
     double numerator, denominator;
     vector<double> t[num_docs];
     for (i = 0; i < num_docs; i++) {
@@ -26,7 +26,7 @@ static inline void pcm_compute_prototypes() {
 
 static inline void estimate_gamas() {
   double k = 1;
-  int i, j;
+  uint i, j;
 
   for (j = 0; j < num_clusters; j++) {
     double numerator = 0;
@@ -46,7 +46,7 @@ static inline void estimate_gamas() {
   }
 }
 
-static inline double tipicality(double distance, int j){
+static inline double tipicality(double distance, uint j){
   double denominator = distance / gamas[j];
   double exp = 1.0 / (fuzziness - 1.0);
   denominator = 1.0 + pow(denominator, exp);
@@ -54,7 +54,7 @@ static inline double tipicality(double distance, int j){
 }
 
 static inline double update_tipicalities() {
-  int i, j;
+  uint i, j;
   double new_uij;
   double tik;
   double sum_ic = 0;

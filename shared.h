@@ -14,8 +14,8 @@
 #define pll pair<ll,ll>
 #define DEBUG true
 #define DEBUG_LOG(A) if(DEBUG) cout << (A) << endl
-#define repeat(SIZE) for(int index = 0; index < (SIZE); index++)
-#define times(VAR,SIZE) for(int VAR = 0; VAR < (SIZE); VAR++)
+#define repeat(SIZE) for(uint index = 0; index < (SIZE); index++)
+#define times(VAR,SIZE) for(uint VAR = 0; VAR < (SIZE); VAR++)
 #define INF 99999999
 #define MAX_DOCS 20000
 #define MAX_CLUSTERS 100 
@@ -39,16 +39,17 @@ struct arguments {
 vector<string> terms;
 vector<double> docs[MAX_DOCS];
 vector<double> prototypes[MAX_CLUSTERS];
-vector<int>    clusters[MAX_CLUSTERS];
+vector<uint>    clusters[MAX_CLUSTERS];
 vector<double> memberships[MAX_DOCS];
 vector<double> tipicalities[MAX_DOCS];
 vector<double> gamas(MAX_CLUSTERS, 0);
 vector<double> final_memberships[MAX_DOCS];
 vector<double> final_tipicalities[MAX_DOCS];
 vector<pii > crisp(MAX_DOCS, mp(0,1));
-int num_terms;
-int num_docs;
-int num_clusters = 3;
+uint num_terms;
+uint num_descriptors = 10;
+uint num_docs;
+uint num_clusters = 3;
 double fuzziness = 1.2; 
 double epsilon = 0.01;
 double a = 1;
@@ -63,14 +64,14 @@ extern std::vector<string> terms;
 extern std::vector<double> docs[MAX_DOCS];
 extern std::vector<double> prototypes[MAX_CLUSTERS];
 extern std::vector<double> tipicalities[MAX_DOCS];
-extern std::vector<int>  clusters[MAX_CLUSTERS];
+extern std::vector<uint>  clusters[MAX_CLUSTERS];
 extern std::vector<double> memberships[MAX_DOCS];
 extern std::vector<double> final_memberships[MAX_DOCS];
 extern vector<double> gamas;
 extern std::vector<pii> crisp;
-extern int num_terms;
-extern int num_docs;
-extern int num_clusters;
+extern uint num_terms;
+extern uint num_docs;
+extern uint num_clusters;
 extern double fuzziness; 
 extern double epsilon;
 extern double a;
@@ -122,25 +123,25 @@ static inline void save_matrix(string fname, vector<double> *matrix, uint size) 
 }
 
 
-static inline double euclidian_norm(int i, int j, vector<double> *x, vector<double> *y) {
+static inline double euclidian_norm(uint i, uint j, vector<double> *x, vector<double> *y) {
   double sum = 0.0;
   #pragma omp parallel for reduction(+:sum)
-  for (int k = 0; k < num_terms; k++) {
+  for (uint k = 0; k < num_terms; k++) {
     sum += pow(x[i][k] - y[j][k], 2);
   }
   return sqrt(sum);
 }
 
-static inline double inner_product(int i, int j, vector<double> *x, vector<double> *y){
+static inline double inner_product(uint i, uint j, vector<double> *x, vector<double> *y){
   double sum = 0.0;
   #pragma omp parallel for reduction(+:sum)
-  for (int k = 0; k < num_terms; k++) {
+  for (uint k = 0; k < num_terms; k++) {
     sum += x[i][k] * y[j][k];
   }
   return sum;
 }
 
-static inline double cosine_norm(int i, int j, vector<double> *x, vector<double> *y){
+static inline double cosine_norm(uint i, uint j, vector<double> *x, vector<double> *y){
     double numerator = inner_product(i, j, x, y);
     if(numerator == 0) return 1;
     double inner_x = inner_product(i, i, x, x);
@@ -148,7 +149,7 @@ static inline double cosine_norm(int i, int j, vector<double> *x, vector<double>
     return 1 - ( numerator / ( sqrt(inner_x) * sqrt(inner_y) ));
 }
 
-static inline double get_norm(int i, int j, vector<double> *x, vector<double> *y){
+static inline double get_norm(uint i, uint j, vector<double> *x, vector<double> *y){
   if(arguments.norm == EUCLIDIAN)
     return euclidian_norm(i, j, x, y);
   if(arguments.norm == COSINE)
@@ -156,8 +157,8 @@ static inline double get_norm(int i, int j, vector<double> *x, vector<double> *y
   return -1;
 }
 
-static inline double get_new_value(int i, int j) {
-    int k;
+static inline double get_new_value(uint i, uint j) {
+    uint k;
     double t, p, sum;
     sum = 0.0;
     p = 2 / (fuzziness - 1);
@@ -180,14 +181,14 @@ static inline void debug_memberships(){
 
 static inline void generate_memberships(){
   double s,rval;
-  int r;
+  uint r;
   crisp.clear();
-  for (int i = 0; i < num_docs; i++) {
+  for (uint i = 0; i < num_docs; i++) {
     s = 0.0;
     r = 100000;
     crisp.pb(mp(0,1));
     memberships[i].clear();
-    for (int j = 0; j < num_clusters-1; j++) {
+    for (uint j = 0; j < num_clusters-1; j++) {
       rval = rand() % (r + 1);
       r -= rval;
       memberships[i].pb(rval / 100000.0);
@@ -232,9 +233,9 @@ static inline double aswc(){
   #pragma omp parallel for reduction(+:sum_up) reduction(+:sum_down)
   times(i, num_docs){
     double s;
-    int g = crisp[i].first;
+    uint g = crisp[i].first;
     vector<double> alphas(num_clusters, 0);
-    vector<int> alphas_count(num_clusters, 0);
+    vector<uint> alphas_count(num_clusters, 0);
     //times(j, num_docs){
     //  int grupo = crisp[j].first;
     //  if(grupo != g) continue;

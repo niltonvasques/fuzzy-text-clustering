@@ -2,7 +2,33 @@
 #define __DESCRIPTORS_H__
 #include "shared.h"
 
-static inline void save_ranking(string fname, priority_queue<pdi> &ranking){
+struct SCORE {
+  double score;
+  uint term;
+  uint cluster;
+  SCORE() {} 
+  SCORE(double _score, uint _term, uint _cluster) : score(_score), term(_term), cluster(_cluster) {} 
+};
+
+class SCOREComparisson
+{
+  bool reverse;
+  public:
+  SCOREComparisson(const bool& revparam=false)
+  {reverse=revparam;}
+  bool operator() (const SCORE& lhs, const SCORE&rhs) const
+  {
+    if (reverse) return (lhs.score>rhs.score);
+    else return (lhs.score<rhs.score);
+  }
+};
+// using mycomparison:
+typedef std::priority_queue<SCORE,std::vector<SCORE>,SCOREComparisson> pq_score;
+
+#define pdpii pair<double, pair<uint,uint> >
+
+
+static inline void save_ranking(string fname, vector<SCORE> &ranking){
   FILE *f;
   if ((f = fopen(fname.c_str(), "w")) == NULL) {
     printf("Cannot create output file.\n");
@@ -10,9 +36,8 @@ static inline void save_ranking(string fname, priority_queue<pdi> &ranking){
   }
 
   for (uint i = 0; i < ranking.size(); i++) {
-    pdi item = ranking.top();
-    ranking.pop();
-    fprintf(f, "%s\t%lf\t", terms[item.second].c_str(), item.first);
+    SCORE item = ranking[i];
+    fprintf(f, "%s\t%lf\t", terms[item.term].c_str(), item.score);
     fprintf(f, "\n");
   }
   fclose(f);
@@ -22,10 +47,9 @@ static inline void soft_fdcl(){
   vector<bool> candidates(num_terms, true);
 
   double threshold = 1.0 / num_clusters;
+  pq_score ranking;
 
-  #pragma omp parallel for
   times(i, num_clusters){
-    priority_queue<pdi> ranking;
     times(j, num_terms){
       double relevants = 0;
       double recovereds = 0;
@@ -64,11 +88,29 @@ static inline void soft_fdcl(){
         printf("  %lf recall is nan", recall);
         printf("  %lf f1 is nan\n", f1);
       } 
-      ranking.push(mp(f1,j)); 
+      ranking.push(SCORE(f1,j,i)); 
     }
-    ostringstream oss;
-    oss << "ranking.cluster" << i;
-    save_ranking(oss.str(), ranking);
+  }
+
+  vector<SCORE> descriptors[num_clusters];
+  vector<SCORE> ranking_by_cluster[num_clusters];
+  vector<bool> choosed(num_terms, false);
+  uint selected = 0;
+  while(selected < num_descriptors*num_clusters && !ranking.empty()){
+    SCORE item = ranking.top(); ranking.pop();
+    ranking_by_cluster[item.cluster].pb(item);
+    if(!choosed[item.term] && descriptors[item.cluster].size() < num_descriptors){
+      choosed[item.term] = true;
+      descriptors[item.cluster].pb(item);
+      selected++;
+    }
+  }
+  times(i, num_clusters){
+    ostringstream oss, oss2;
+    oss << "descriptors.cluster" << i;
+    save_ranking(oss.str(), descriptors[i]);
+    oss2 << "ranking.cluster" << i;
+    save_ranking(oss2.str(), ranking_by_cluster[i]);
   }
 }
 
