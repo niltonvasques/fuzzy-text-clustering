@@ -43,13 +43,52 @@ static inline void save_ranking(string fname, vector<SCORE> &ranking){
   fclose(f);
 }
 
+static inline void save_arff(string fname, vector<SCORE> *descriptors){
+  FILE *f;
+  if ((f = fopen(fname.c_str(), "w")) == NULL) {
+    printf("Cannot create output file.\n");
+    exit(1);
+  }
+  fprintf(f, "@RELATION relation_name\n\n");
+  times(i, max_groups){
+    times(j, descriptors[i].size()){
+      SCORE item = descriptors[i][j];
+      fprintf(f, "@ATTRIBUTE %s\tNUMERIC\n",terms[item.term].c_str());
+    }
+  }
+  fprintf(f, "@ATTRIBUTE class \t{");
+  times(i, max_groups){
+    if(i > 0)
+      fprintf(f, ",");
+    fprintf(f, "cluster_%d", i);
+  }
+  fprintf(f, "}\n\n");
+  fprintf(f, "@DATA\n");
+  times(k, num_docs){
+    double max_degree = 0;
+    uint g = 0;
+    times(i, max_groups){
+      if(memberships[k][i] > max_degree){
+        g = i;
+        max_degree = memberships[k][i];
+      }
+      times(j, descriptors[i].size()){
+        SCORE item = descriptors[i][j];
+        fprintf(f, "%lf,",docs[k][item.term]);
+      }
+    }
+    fprintf(f, "cluster_%d\n",g);
+  }
+  fclose(f);
+}
+
 static inline void soft_fdcl(){
   vector<bool> candidates(num_terms, true);
 
-  double threshold = 1.0 / num_clusters;
+  double threshold = 1.0 / max_groups;
   pq_score ranking;
 
-  times(i, num_clusters){
+  times(i, max_groups){
     times(j, num_terms){
       double relevants = 0;
       double recovereds = 0;
@@ -92,26 +131,29 @@ static inline void soft_fdcl(){
     }
   }
 
-  vector<SCORE> descriptors[num_clusters];
-  vector<SCORE> ranking_by_cluster[num_clusters];
+  vector<SCORE> descriptors[max_groups];
+  vector<SCORE> ranking_by_cluster[max_groups];
   vector<bool> choosed(num_terms, false);
   uint selected = 0;
-  while(selected < num_descriptors*num_clusters && !ranking.empty()){
+  while(!ranking.empty()){
     SCORE item = ranking.top(); ranking.pop();
     ranking_by_cluster[item.cluster].pb(item);
-    if(!choosed[item.term] && descriptors[item.cluster].size() < num_descriptors){
+
+    if(selected < num_descriptors*max_groups && !choosed[item.term] &&
+        descriptors[item.cluster].size() < num_descriptors){
       choosed[item.term] = true;
       descriptors[item.cluster].pb(item);
       selected++;
     }
   }
-  times(i, num_clusters){
+  times(i, max_groups){
     ostringstream oss, oss2;
     oss << "descriptors.cluster" << i;
     save_ranking(oss.str(), descriptors[i]);
     oss2 << "ranking.cluster" << i;
     save_ranking(oss2.str(), ranking_by_cluster[i]);
   }
+  save_arff("clusters.arff", descriptors);
 }
 
 #endif

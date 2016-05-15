@@ -108,7 +108,7 @@ int main(int argc, char *argv[]){
 
   double max_fs = -2;
   double fs;
-  uint max_groups = 2;
+  max_groups = 2;
   printf("find optimal cluster number from 2 to %d\n", max_clusters);
   for(uint i = 2; i <= max_clusters; i++){
     printf("computing clustering with %d groups\n", i);

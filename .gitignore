@@ -5,3 +5,9 @@ ranking.cluste*
 discover.*
 *.matrix
 clustering
+*.arff
+paralle.cpp
+parallel
+teste*
+*.in
+*.cluster*
