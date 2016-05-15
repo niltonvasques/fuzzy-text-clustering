@@ -33,6 +33,7 @@ struct arguments {
   NORM norm;
   bool verbose;
   char *input;
+  const char *path;
   double a,b,m,n,c,r;
 };
 

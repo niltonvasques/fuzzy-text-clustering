@@ -28,6 +28,7 @@ static struct argp_option options[] = {
   { "k", 'k', 0, 0, "Set cosine norm. DEFAULT=euclidian"},
   { "d", 'd', 0, 0, "Set euclidian norm. DEFAULT=euclidian"},
   { "r", 'r', "VALUE", 0, "Set random initials. DEFAULT=5"},
+  { "o", 'o', "PATH", 0, "Set output path. DEFAULT=./"},
   { 0 } 
 };
 
@@ -39,6 +40,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
     case 'p': arguments->mode = PCM; break;
     case 'x': arguments->mode = PFCM; break;
     case 'i': arguments->input = arg; break;
+    case 'o': arguments->path = arg; break;
     case 'v': arguments->verbose = true; break;
     case 'a': arguments->a = atof(arg); break;
     case 'b': arguments->b = atof(arg); break;
@@ -69,6 +71,8 @@ int main(int argc, char *argv[]){
   arguments.c = 3;
   arguments.r = 5;
   arguments.norm = EUCLIDIAN;
+  string path = "";
+  arguments.path = path.c_str();
 
   argp_parse(&argp, argc, argv, 0, 0, &arguments);
 
@@ -150,7 +154,15 @@ int main(int argc, char *argv[]){
   save_matrix("prototypes.matrix", prototypes, num_clusters);
 
   printf ("extracting descriptors...\n");
-  soft_fdcl();
+  if(arguments.mode == PCM){
+    soft_fdcl();
+    pdcl();
+  }else if(arguments.mode == FCM){
+    soft_fdcl();
+  }else if(arguments.mode == PFCM){
+    soft_fdcl();
+    mixed_pdcl();
+  }
 
   printf ("the clustering process has finished\n");
   printf ("------------------------------------------------------------------------\n");
