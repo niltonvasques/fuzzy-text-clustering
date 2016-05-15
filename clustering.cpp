@@ -24,12 +24,12 @@ static struct argp_option options[] = {
   { "b", 'b', "VALUE", 0, "PFCM b param. DEFAULT=2"},
   { "m", 'm', "VALUE", 0, "Set m fuzziness param. DEFAULT=1.2"},
   { "n", 'n', "VALUE", 0, "Set n fuzziness param. DEFAULT=1.2"},
-  { "g", 'c', "VALUE", 0, "Set max clusters. DEFAULT=3"},
-  { "k", 'k', 0, 0, "Set cosine norm. DEFAULT=euclidian"},
-  { "d", 'd', 0, 0, "Set euclidian norm. DEFAULT=euclidian"},
-  { "r", 'r', "VALUE", 0, "Set random initials. DEFAULT=5"},
-  { "o", 'o', "PATH", 0, "Set output path. DEFAULT=./"},
-  { "e", 'e', "VALUE", 0, "Set epsilon. DEFAULT=0.01"},
+  { "clusters", 'c', "VALUE", 0, "Set max clusters. DEFAULT=3"},
+  { "cosine", 'k', 0, 0, "Set cosine norm. DEFAULT=euclidian"},
+  { "euclidian", 'd', 0, 0, "Set euclidian norm. DEFAULT=euclidian"},
+  { "random", 'r', "VALUE", 0, "Set random initials. DEFAULT=5"},
+  { "output", 'o', "PATH", 0, "Set output path. DEFAULT=./"},
+  { "epsilon", 'e', "VALUE", 0, "Set epsilon. DEFAULT=0.01"},
   { 0 } 
 };
 

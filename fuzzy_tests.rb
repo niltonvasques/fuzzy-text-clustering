@@ -92,22 +92,22 @@ $bases = {
   #reuters: "#{$bases_path}/reuters.in", 
 }
 
-#$bases_class = { 
-#  opinosis:   3,
-#  newsgroup:  4,
-#  hitech:     6,
-#  nsf:        16,
-#  wap:        20,
-#  reuters:    43,
-#}
 $bases_class = { 
   opinosis:   3,
-  newsgroup:  3,
-  hitech:     3,
-  nsf:        3,
-  wap:        3,
-  reuters:    3,
+  newsgroup:  4,
+  hitech:     6,
+  nsf:        16,
+  wap:        20,
+  reuters:    43,
 }
+#$bases_class = { 
+#  opinosis:   3,
+#  newsgroup:  3,
+#  hitech:     3,
+#  nsf:        3,
+#  wap:        3,
+#  reuters:    3,
+#}
 
 def arr_to_hash(arr)
   count  = 0
