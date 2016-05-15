@@ -1,5 +1,5 @@
 CC=g++
-FLAGS=-Wall
+FLAGS=-Wall -fopenmp -O2
 
 
 all: clean clustering.cpp

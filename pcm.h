@@ -32,7 +32,7 @@ static inline void estimate_gamas() {
     double numerator = 0;
     double denominator = 0;
     for (i = 0; i < num_docs; i++) {
-      double dij = get_norm(i, j); 
+      double dij = get_norm(i, j, docs, prototypes); 
       double uij = memberships[i][j]; 
       uij = pow(uij, fuzziness);
       //printf("dij %f uij %f\n", dij, uij);
@@ -70,7 +70,7 @@ static inline double update_tipicalities() {
   for (i = 0; i < num_docs; i++) {
     sum_ic = 0;
     for (j = 0; j < num_clusters; j++) {
-      distance = get_norm(i, j);
+      distance = get_norm(i, j, docs, prototypes);
       new_uij = tipicality(distance, j);
       tik = pow(new_uij, fuzziness);
       sum_ic += tik * distance;

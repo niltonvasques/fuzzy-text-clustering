@@ -23,6 +23,7 @@ static inline void soft_fdcl(){
 
   double threshold = 1.0 / num_clusters;
 
+  #pragma omp parallel for
   times(i, num_clusters){
     priority_queue<pdi> ranking;
     times(j, num_terms){

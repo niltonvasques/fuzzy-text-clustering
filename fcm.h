@@ -3,19 +3,18 @@
 #include "shared.h"
 
 static inline void compute_prototypes() {
-    int i, j, k;
-    double numerator, denominator;
     vector<double> t[num_docs];
-    for (i = 0; i < num_docs; i++) {
-        for (j = 0; j < num_clusters; j++) {
+    for (int i = 0; i < num_docs; i++) {
+        for (int j = 0; j < num_clusters; j++) {
             t[i].pb(pow(memberships[i][j], fuzziness));
         }
     }
-    for (j = 0; j < num_clusters; j++) {
-        for (k = 0; k < num_terms; k++) {
-            numerator = 0.0;
-            denominator = 0.0;
-            for (i = 0; i < num_docs; i++) {
+    #pragma omp parallel for collapse(2)
+    for (int j = 0; j < num_clusters; j++) {
+        for (int k = 0; k < num_terms; k++) {
+            double numerator = 0.0;
+            double denominator = 0.0;
+            for (int i = 0; i < num_docs; i++) {
                 numerator += t[i][j] * docs[i][k];
                 denominator += t[i][j];
             }
@@ -25,16 +24,14 @@ static inline void compute_prototypes() {
 }
 
 static inline double update_memberships() {
-    int i, j;
-    double new_uij;
-    double max_diff = 0.0, diff;
-    for (j = 0; j < num_clusters; j++) {
-      for (i = 0; i < num_docs; i++) {
-        new_uij = get_new_value(i, j);
-        diff = new_uij - memberships[i][j];
-        if (diff > max_diff)
-          max_diff = diff;
+    double max_diff = 0.0;
+    for (int j = 0; j < num_clusters; j++) {
+      for (int i = 0; i < num_docs; i++) {
+        double new_uij = get_new_value(i, j);
+        double diff = new_uij - memberships[i][j];
         memberships[i][j] = new_uij;
+
+        max_diff = MAX(diff, max_diff);
       }
     }
     return max_diff;

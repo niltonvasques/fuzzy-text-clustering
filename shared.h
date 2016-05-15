@@ -27,11 +27,13 @@
 using namespace std;
 
 enum METHOD { FCM, PCM, PFCM };
+enum NORM { EUCLIDIAN, COSINE };
 struct arguments {
   METHOD mode;
+  NORM norm;
   bool verbose;
   char *input;
-  double a,b,m,n,c;
+  double a,b,m,n,c,r;
 };
 
 vector<string> terms;
@@ -85,35 +87,18 @@ static inline void read_data(){
 
   cin >> num_terms >> num_docs;
 
-  cin >> line; // First discover.names line is useless
-
-  repeat(num_terms-1){
+  repeat(num_terms){
     cin >> line;
-    int token_index = line.find(":");
-    line.erase(line.begin()+token_index, line.end());
-    line = line.substr(1,line.size()-2);
     terms.pb(line);
-    
     //DEBUG_LOG(line);
   }
 
   times(i, num_docs){
-    getline(cin, line, ','); // first value is just the filename
-    //DEBUG_LOG("TITLE");
-    //DEBUG_LOG(line);
     double frequency; 
-    times(j, num_terms-1){
-      if(j == (num_terms-2)){ //Last field don't have a comma
-        cin >> frequency; 
-      }else{
-        getline(cin, line, ',');
-        frequency = atof(line.c_str());
-      }
+    times(j, num_terms){
+      cin >> frequency; 
       docs[i].pb(frequency);
     }
-    //DEBUG_LOG("endline");
-    //DEBUG_LOG(line);
-    //DEBUG_LOG(frequency);
   }
 }
 
@@ -136,22 +121,39 @@ static inline void save_matrix(string fname, vector<double> *matrix, uint size) 
       fclose(f);
 }
 
-static inline double norm_doc2doc(int i, int j) {
-    int k;
-    double sum = 0.0;
-    for (k = 0; k < num_terms; k++) {
-        sum += pow(docs[i][k] - docs[j][k], 2);
-    }
-    return sqrt(sum);
+
+static inline double euclidian_norm(int i, int j, vector<double> *x, vector<double> *y) {
+  double sum = 0.0;
+  #pragma omp parallel for reduction(+:sum)
+  for (int k = 0; k < num_terms; k++) {
+    sum += pow(x[i][k] - y[j][k], 2);
+  }
+  return sqrt(sum);
 }
 
-static inline double get_norm(int i, int j) {
-    int k;
-    double sum = 0.0;
-    for (k = 0; k < num_terms; k++) {
-        sum += pow(docs[i][k] - prototypes[j][k], 2);
-    }
-    return sqrt(sum);
+static inline double inner_product(int i, int j, vector<double> *x, vector<double> *y){
+  double sum = 0.0;
+  #pragma omp parallel for reduction(+:sum)
+  for (int k = 0; k < num_terms; k++) {
+    sum += x[i][k] * y[j][k];
+  }
+  return sum;
+}
+
+static inline double cosine_norm(int i, int j, vector<double> *x, vector<double> *y){
+    double numerator = inner_product(i, j, x, y);
+    if(numerator == 0) return 1;
+    double inner_x = inner_product(i, i, x, x);
+    double inner_y = inner_product(j, j, y, y);
+    return 1 - ( numerator / ( sqrt(inner_x) * sqrt(inner_y) ));
+}
+
+static inline double get_norm(int i, int j, vector<double> *x, vector<double> *y){
+  if(arguments.norm == EUCLIDIAN)
+    return euclidian_norm(i, j, x, y);
+  if(arguments.norm == COSINE)
+    return cosine_norm(i, j, x, y);
+  return -1;
 }
 
 static inline double get_new_value(int i, int j) {
@@ -160,7 +162,7 @@ static inline double get_new_value(int i, int j) {
     sum = 0.0;
     p = 2 / (fuzziness - 1);
     for (k = 0; k < num_clusters; k++) {
-        t = get_norm(i, j) / get_norm(i, k);
+        t = get_norm(i, j, docs, prototypes) / get_norm(i, k, docs, prototypes);
         t = pow(t, p);
         sum += t;
     }
@@ -206,7 +208,7 @@ static inline void init_prototypes(){
 
 static inline double aswc(){
   double fs = 0;
-  double s = 0;
+  #pragma omp parallel for
   times(i, num_docs){
     double max1_degree = 0;
     double max2_degree = 0;
@@ -227,20 +229,24 @@ static inline double aswc(){
     }
   }
   double sum_up = 0, sum_down = 0;
+  #pragma omp parallel for reduction(+:sum_up) reduction(+:sum_down)
   times(i, num_docs){
+    double s;
     int g = crisp[i].first;
     vector<double> alphas(num_clusters, 0);
     vector<int> alphas_count(num_clusters, 0);
-    times(j, num_docs){
-      int grupo = crisp[j].first;
-      alphas[grupo] += norm_doc2doc(i, j);
-      alphas_count[grupo]++;
-    }
-    double alpha_g = alphas[g] / alphas_count[g];
+    //times(j, num_docs){
+    //  int grupo = crisp[j].first;
+    //  if(grupo != g) continue;
+    //  alphas[grupo] += norm_doc2doc(i, j);
+    //  alphas_count[grupo]++;
+    //}
+    //double alpha_g = alphas[g] / alphas_count[g];
+    double alpha_g = get_norm(i, g, docs, prototypes);
     double beta = INF;
     times(h, num_clusters){
-      if(h != g && alphas_count[h] > 0){
-        beta = MIN(beta, alphas[h]/alphas_count[h]);
+      if(h != g){
+        beta = MIN(beta, get_norm(i, h, docs, prototypes));
       }
     }
     if(beta == INF)
@@ -260,11 +266,13 @@ static inline double aswc(){
 }
 
 static inline void store_final_memberships(){
+  #pragma omp parallel for
   times(i, num_docs){
     final_memberships[i].swap(memberships[i]);
   }
 }
 static inline void store_final_tipicalities(){
+  #pragma omp parallel for
   times(i, num_docs){
     final_tipicalities[i].swap(tipicalities[i]);
   }

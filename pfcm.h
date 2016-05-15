@@ -50,7 +50,7 @@ static inline double pfcm_update_memberships_and_tipicalities() {
 
   for (i = 0; i < num_docs; i++) {
     for (j = 0; j < num_clusters; j++) { 
-      distance = get_norm(i, j); 
+      distance = get_norm(i, j, docs, prototypes); 
       new_uij = get_new_value(i, j);
       tipicalities[i][j] = pfcm_tipicality(distance, j);
 
