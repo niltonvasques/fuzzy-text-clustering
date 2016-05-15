@@ -34,7 +34,7 @@ struct arguments {
   bool verbose;
   char *input;
   const char *path;
-  double a,b,m,n,c,r;
+  double a,b,m,n,c,r,epsilon;
 };
 
 vector<string> terms;

@@ -29,6 +29,7 @@ static struct argp_option options[] = {
   { "d", 'd', 0, 0, "Set euclidian norm. DEFAULT=euclidian"},
   { "r", 'r', "VALUE", 0, "Set random initials. DEFAULT=5"},
   { "o", 'o', "PATH", 0, "Set output path. DEFAULT=./"},
+  { "e", 'e', "VALUE", 0, "Set epsilon. DEFAULT=0.01"},
   { 0 } 
 };
 
@@ -50,6 +51,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
     case 'r': arguments->r = atof(arg); break;
     case 'd': arguments->norm = EUCLIDIAN; break;
     case 'k': arguments->norm = COSINE; break;
+    case 'e': arguments->epsilon = atof(arg); break;
     case ARGP_KEY_ARG: return 0;
     default: return ARGP_ERR_UNKNOWN;
   }   
