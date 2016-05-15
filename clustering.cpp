@@ -20,6 +20,11 @@ static struct argp_option options[] = {
   { "pfcm", 'x', 0, 0, "Run possibilistc fuzzy c means."},
   { "input", 'i', "INPUT", 0, "Path for input data."},
   { "verbose", 'v', 0, 0, "More verbose execution."},
+  { "a", 'a', "VALUE", 0, "PFCM a param. DEFAULT=1"},
+  { "b", 'b', "VALUE", 0, "PFCM b param. DEFAULT=2"},
+  { "m", 'm', "VALUE", 0, "Set m fuzziness param. DEFAULT=1.2"},
+  { "n", 'n', "VALUE", 0, "Set n fuzziness param. DEFAULT=1.2"},
+  { "g", 'c', "VALUE", 0, "Set max clusters. DEFAULT=3"},
   { 0 } 
 };
 
@@ -32,6 +37,11 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
     case 'x': arguments->mode = PFCM; break;
     case 'i': arguments->input = arg; break;
     case 'v': arguments->verbose = true; break;
+    case 'a': arguments->a = atof(arg); break;
+    case 'b': arguments->b = atof(arg); break;
+    case 'm': arguments->m = atof(arg); break;
+    case 'n': arguments->n = atof(arg); break;
+    case 'c': arguments->c = atof(arg); break;
     case ARGP_KEY_ARG: return 0;
     default: return ARGP_ERR_UNKNOWN;
   }   
@@ -46,8 +56,19 @@ int main(int argc, char *argv[]){
 
   arguments.mode = FCM;
   arguments.verbose = false;
+  arguments.a = 1;
+  arguments.b = 2;
+  arguments.m = 1.2;
+  arguments.n = 1.2;
+  arguments.c = 3;
 
   argp_parse(&argp, argc, argv, 0, 0, &arguments);
+
+  a = arguments.a;
+  b = arguments.a;
+  fuzziness = fuzziness_m = arguments.m;
+  fuzziness_n = arguments.n;
+  int max_clusters = arguments.c;
 
   //if(!arguments.input) {
   //  printf("--input FILE is required.\n");
@@ -66,10 +87,11 @@ int main(int argc, char *argv[]){
 
   read_data();
 
-  double max_fs = -1;
+  double max_fs = -2;
   double fs;
   int max_groups = 2;
-  for(int i = 3; i <= 3; i++){
+  printf("find optimal cluster number from 2 to %d\n", max_clusters);
+  for(int i = 2; i <= max_clusters; i++){
     printf("computing clustering with %d groups\n", i);
     num_clusters = i;
     if(arguments.mode == PCM){

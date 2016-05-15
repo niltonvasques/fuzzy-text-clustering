@@ -16,6 +16,7 @@
 #define DEBUG_LOG(A) if(DEBUG) cout << (A) << endl
 #define repeat(SIZE) for(int index = 0; index < (SIZE); index++)
 #define times(VAR,SIZE) for(int VAR = 0; VAR < (SIZE); VAR++)
+#define INF 99999999
 #define MAX_DOCS 20000
 #define MAX_CLUSTERS 100 
 #define uint unsigned int
@@ -30,6 +31,7 @@ struct arguments {
   METHOD mode;
   bool verbose;
   char *input;
+  double a,b,m,n,c;
 };
 
 vector<string> terms;
@@ -209,7 +211,11 @@ static inline double aswc(){
     double max1_degree = 0;
     double max2_degree = 0;
     times(j, num_clusters){
-      if(j == 0 || memberships[i][j] > max1_degree){
+      if(j == 0){
+        crisp[i] = mp(0,1);
+        max1_degree = memberships[i][0];
+        max2_degree = memberships[i][1];
+      }else if(memberships[i][j] > max1_degree){
         max1_degree = memberships[i][j];
         pii item = crisp[i];
         crisp[i] = mp(j,item.first);
@@ -231,20 +237,23 @@ static inline double aswc(){
       alphas_count[grupo]++;
     }
     double alpha_g = alphas[g] / alphas_count[g];
-    double beta = 999;
+    double beta = INF;
     times(h, num_clusters){
       if(h != g && alphas_count[h] > 0){
         beta = MIN(beta, alphas[h]/alphas_count[h]);
       }
     }
-    s = (beta - alpha_g)/MAX(beta, alpha_g);
+    if(beta == INF)
+      s = -1;
+    else
+      s = (beta - alpha_g)/MAX(beta, alpha_g);
     double u1 = memberships[i][crisp[i].first];
     double u2 = memberships[i][crisp[i].second];
     sum_up += s * (u1 - u2);
     sum_down += (u1 - u2);
     if(arguments.verbose) 
-      printf("d%d: %lf beta %lf alpha %lf u1 %lf u2 %lf sumup %lf sumdown\n", i, beta,
-        alpha_g, u1, u2, sum_up, sum_down);
+      printf("d%d: %lf beta %lf alpha %lf u1 %lf u2 %lf s %lf sumup %lf sumdown\n", i, beta,
+        alpha_g, u1, u2, s, sum_up, sum_down);
   }
   fs = sum_up / sum_down;
   return fs;
