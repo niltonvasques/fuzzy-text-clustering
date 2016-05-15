@@ -28,7 +28,10 @@ using namespace std;
 std::vector<string> terms;
 std::vector<double> docs[MAX_DOCS];
 std::vector<double> prototypes[MAX_CLUSTERS];
+std::vector<int>    clusters[MAX_CLUSTERS];
 std::vector<double> memberships[MAX_DOCS];
+std::vector<double> final_memberships[MAX_DOCS];
+std::vector<pii > crisp(MAX_DOCS, mp(0,1));
 int num_terms;
 int num_docs;
 int num_clusters = 3;
@@ -40,7 +43,10 @@ double epsilon = 0.01;
 extern std::vector<string> terms;
 extern std::vector<double> docs[MAX_DOCS];
 extern std::vector<double> prototypes[MAX_CLUSTERS];
+extern std::vector<int>  clusters[MAX_CLUSTERS];
 extern std::vector<double> memberships[MAX_DOCS];
+extern std::vector<double> final_memberships[MAX_DOCS];
+extern std::vector<pii> crisp;
 extern int num_terms;
 extern int num_docs;
 extern int num_clusters;
@@ -90,6 +96,9 @@ static inline void read_data(){
 static inline void save_matrix(string fname, vector<double> *matrix, uint size) {
     uint i, j;
     FILE *f;
+    if(fname == ""){
+      f = stdout;
+    }
     if ((f = fopen(fname.c_str(), "w")) == NULL) {
         printf("Cannot create output file.\n");
         exit(1);
@@ -101,6 +110,15 @@ static inline void save_matrix(string fname, vector<double> *matrix, uint size) 
         fprintf(f, "\n");
     }
     fclose(f);
+}
+
+static inline double norm_doc2doc(int i, int j) {
+    int k;
+    double sum = 0.0;
+    for (k = 0; k < num_terms; k++) {
+        sum += pow(docs[i][k] - docs[j][k], 2);
+    }
+    return sqrt(sum);
 }
 
 static inline double get_norm(int i, int j) {
@@ -137,9 +155,12 @@ static inline void debug_memberships(){
 static inline void generate_memberships(){
   double s,rval;
   int r;
+  crisp.clear();
   for (int i = 0; i < num_docs; i++) {
     s = 0.0;
     r = 100000;
+    crisp.pb(mp(0,1));
+    memberships[i].clear();
     for (int j = 0; j < num_clusters-1; j++) {
       rval = rand() % (r + 1);
       r -= rval;
@@ -152,9 +173,18 @@ static inline void generate_memberships(){
 
 static inline void init_prototypes(){
   times(i, num_clusters){
+    prototypes[i].clear();
     times(j, num_terms){
       prototypes[i].pb(0);
     }
+  }
+}
+
+static inline void copy_memberships(){
+  times(i, num_docs){
+    final_memberships[i].clear();
+    final_memberships[i].reserve(memberships[i].size());
+    copy(memberships[i].begin(), memberships[i].end(), final_memberships[i].begin());
   }
 }
 

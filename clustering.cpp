@@ -1,9 +1,7 @@
 #include <bits/stdc++.h>
 #include "shared.h"
 
-
 using namespace std;
-
 
 static inline void compute_prototypes() {
     int i, j, k;
@@ -32,13 +30,13 @@ static inline double update_memberships() {
     double new_uij;
     double max_diff = 0.0, diff;
     for (j = 0; j < num_clusters; j++) {
-        for (i = 0; i < num_docs; i++) {
-            new_uij = get_new_value(i, j);
-            diff = new_uij - memberships[i][j];
-            if (diff > max_diff)
-                max_diff = diff;
-            memberships[i][j] = new_uij;
-        }
+      for (i = 0; i < num_docs; i++) {
+        new_uij = get_new_value(i, j);
+        diff = new_uij - memberships[i][j];
+        if (diff > max_diff)
+          max_diff = diff;
+        memberships[i][j] = new_uij;
+      }
     }
     return max_diff;
 }
@@ -76,7 +74,7 @@ static inline void soft_fdcl(){
       times(k, num_docs){
         if(docs[k][j] > 0.0) recovereds++;
 
-        double degree = memberships[k][i];
+        double degree = final_memberships[k][i];
         if(degree >= threshold){
           relevants++;
           if(docs[k][j] > 0.0) correct_recovereds++;
@@ -125,16 +123,79 @@ static inline void fcm(){
     max_diff = update_memberships();
     cout << max_diff << endl;
   } while (max_diff > epsilon);
+}
 
-  save_matrix("memberships.matrix", memberships, num_docs);
-  save_matrix("prototypes.matrix", prototypes, num_clusters);
+static inline double aswc(){
+  double fs = 0;
+  double s = 0;
+  times(i, num_docs){
+    double max1_degree = 0;
+    double max2_degree = 0;
+    times(j, num_clusters){
+      if(j == 0 || memberships[i][j] > max1_degree){
+        max1_degree = memberships[i][j];
+        pii item = crisp[i];
+        crisp[i] = mp(j,item.first);
+        max2_degree = memberships[i][item.first];
+      }else if(memberships[i][j] > max2_degree){
+        max2_degree = memberships[i][j];
+        crisp[i].second = j;
+      }
+    }
+  }
+  double sum_up = 0, sum_down = 0;
+  times(i, num_docs){
+    int g = crisp[i].first;
+    vector<double> alphas(num_clusters, 0);
+    vector<int> alphas_count(num_clusters, 0);
+    times(j, num_docs){
+      int grupo = crisp[j].first;
+      alphas[grupo] += norm_doc2doc(i, j);
+      alphas_count[grupo]++;
+    }
+    double alpha_g = alphas[g] / alphas_count[g];
+    double beta = 999;
+    times(h, num_clusters){
+      if(h != g){
+        beta = MIN(beta, alphas[h]/alphas_count[h]);
+      }
+    }
+    s = (beta - alpha_g)/MAX(beta, alpha_g);
+    double u1 = memberships[i][crisp[i].first];
+    double u2 = memberships[i][crisp[i].second];
+    sum_up += s * (u1 - u2);
+    sum_down += (u1 - u2);
+    //printf("d%d: %lf beta %lf alpha %lf u1 %lf u2 %lf sumup %lf sumdown\n", i, beta,
+     //   alpha_g, u1, u2, sum_up, sum_down);
+  }
+  fs = sum_up / sum_down;
+  return fs;
 }
 
 int main(){
 
   read_data();
 
-  fcm();
+  double max_fs = -1;
+  double fs;
+  int max_groups = 2;
+  for(int i = 3; i < 3; i++){
+    num_clusters = i;
+    fcm();
+    fs = aswc();
+    cout << "FS: " << fs << endl;
+    printf("%lf aswc %d groups\n", fs, i);
+    if(fs > max_fs){
+      max_fs = fs;
+      max_groups = i;
+      copy_memberships();
+      save_matrix("", final_memberships, num_docs);
+      printf("max fs found: %lf aswc %d groups\n", fs, i);
+    }
+  }
+  printf("final fs: %lf aswc %d groups\n", max_fs, max_groups);
+  save_matrix("memberships.matrix", final_memberships, num_docs);
+  save_matrix("prototypes.matrix", prototypes, num_clusters);
   soft_fdcl();
 
   return 0;
