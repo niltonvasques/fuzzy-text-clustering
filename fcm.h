@@ -51,7 +51,8 @@ static inline void fcm(){
   do {
     compute_prototypes();
     max_diff = update_memberships();
-    cout << max_diff << endl;
+    if(arguments.verbose) 
+      cout << max_diff << endl;
   } while (max_diff > epsilon);
 }
 

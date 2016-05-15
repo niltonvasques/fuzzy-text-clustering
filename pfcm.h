@@ -99,7 +99,8 @@ int pfcm() {
     curr_j = pfcm_update_memberships_and_tipicalities();
     max_diff = fabs(curr_j - old_j);
     old_j = curr_j;
-    printf("max_diff: %f curr_j: %f\n", max_diff, curr_j);
+    if(arguments.verbose) 
+      printf("max_diff: %f curr_j: %f\n", max_diff, curr_j);
   } while (max_diff > epsilon);
   return 0;
 }

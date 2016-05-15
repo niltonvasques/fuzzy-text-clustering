@@ -41,7 +41,8 @@ static inline void estimate_gamas() {
     }
     //printf("numerator %f denominator %f\n", numerator, denominator);
     gamas[j] = k * (numerator / denominator);
-    printf("gamas[%d]: %f\n", j, gamas[j]);
+    if(arguments.verbose) 
+      printf("gamas[%d]: %f\n", j, gamas[j]);
   }
 }
 
@@ -102,7 +103,8 @@ int pcm() {
     curr_j = update_tipicalities();
     max_diff = abs(curr_j - old_j);
     old_j = curr_j;
-    printf("max_diff: %f\n", max_diff);
+    if(arguments.verbose) 
+      printf("max_diff: %f\n", max_diff);
   } while (max_diff > epsilon);
   return 0;
 }

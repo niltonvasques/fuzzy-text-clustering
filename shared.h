@@ -25,6 +25,13 @@
 
 using namespace std;
 
+enum METHOD { FCM, PCM, PFCM };
+struct arguments {
+  METHOD mode;
+  bool verbose;
+  char *input;
+};
+
 vector<string> terms;
 vector<double> docs[MAX_DOCS];
 vector<double> prototypes[MAX_CLUSTERS];
@@ -44,6 +51,7 @@ double a = 1;
 double b = 2;
 double fuzziness_n = 1.2; 
 double fuzziness_m = 1.2; 
+struct arguments arguments;
 
 #else
 
@@ -65,6 +73,7 @@ extern double a;
 extern double b;
 extern double fuzziness_n = 1.2; 
 extern double fuzziness_m = 1.4; 
+extern struct arguments arguments;
 
 #endif
 
@@ -112,7 +121,7 @@ static inline void save_matrix(string fname, vector<double> *matrix, uint size) 
     if(fname == ""){
       f = stdout;
     }else if ((f = fopen(fname.c_str(), "w")) == NULL) {
-        printf("Cannot create output file.\n");
+        fprintf(stderr, "Cannot create output file.\n");
         exit(1);
     }
     for (i = 0; i < size; i++) {
@@ -233,7 +242,8 @@ static inline double aswc(){
     double u2 = memberships[i][crisp[i].second];
     sum_up += s * (u1 - u2);
     sum_down += (u1 - u2);
-    printf("d%d: %lf beta %lf alpha %lf u1 %lf u2 %lf sumup %lf sumdown\n", i, beta,
+    if(arguments.verbose) 
+      printf("d%d: %lf beta %lf alpha %lf u1 %lf u2 %lf sumup %lf sumdown\n", i, beta,
         alpha_g, u1, u2, sum_up, sum_down);
   }
   fs = sum_up / sum_down;
