@@ -146,14 +146,23 @@ int main(int argc, char *argv[]){
   printf ("------------------------------------------------------------------------\n");
   printf ("saving matrix data...\n");
   if(arguments.mode == PCM){
-    save_matrix("tipicalities.matrix", final_memberships, num_docs);
+    ostringstream oss;
+    oss << arguments.path << "tipicalities.matrix";
+    save_matrix(oss.str(), final_memberships, num_docs);
   }else if(arguments.mode == FCM){
-    save_matrix("memberships.matrix", final_memberships, num_docs);
+    ostringstream oss;
+    oss << arguments.path << "memberships.matrix";
+    save_matrix(oss.str(), final_memberships, num_docs);
   }else if(arguments.mode == PFCM){
-    save_matrix("tipicalties.matrix", final_tipicalities, num_docs);
-    save_matrix("memberships.matrix", final_memberships, num_docs);
+    ostringstream oss, oss2;
+    oss << arguments.path << "memberships.matrix";
+    oss2 << arguments.path << "tipicalities.matrix";
+    save_matrix(oss.str(), final_tipicalities, num_docs);
+    save_matrix(oss2.str(), final_memberships, num_docs);
   }
-  save_matrix("prototypes.matrix", prototypes, num_clusters);
+  ostringstream oss;
+  oss << arguments.path << "prototypes.matrix";
+  save_matrix(oss.str(), prototypes, num_clusters);
 
   printf ("extracting descriptors...\n");
   if(arguments.mode == PCM){
