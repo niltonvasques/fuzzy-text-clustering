@@ -85,20 +85,28 @@ $results_path = "/home/niltonvasques/Documents/ufba/tcc/results/results-c++-#{Ti
 
 $bases = { 
   opinosis: "#{$bases_path}/opinosis.in",
-  #newsgroup: "#{$bases_path}/20newsgroup.in",
-  #hitech: "#{$bases_path}/hitech.in",
-  #nsf: "#{$bases_path}/nsf.in",
-  #wap: "#{$bases_path}/wap.in",
+  newsgroup: "#{$bases_path}/20newsgroup.in",
+  hitech: "#{$bases_path}/hitech.in",
+  nsf: "#{$bases_path}/nsf.in",
+  wap: "#{$bases_path}/wap.in",
   #reuters: "#{$bases_path}/reuters.in", 
 }
 
+#$bases_class = { 
+#  opinosis:   3,
+#  newsgroup:  4,
+#  hitech:     6,
+#  nsf:        16,
+#  wap:        20,
+#  reuters:    43,
+#}
 $bases_class = { 
   opinosis:   3,
-  newsgroup:  4,
-  hitech:     6,
-  nsf:        16,
-  wap:        4,
-  reuters:    43,
+  newsgroup:  3,
+  hitech:     3,
+  nsf:        3,
+  wap:        3,
+  reuters:    3,
 }
 
 def arr_to_hash(arr)
@@ -190,8 +198,8 @@ def main
     $clusters.each do |c| 
       result_folder = "#{$results_path}/#{c}-#{k}"
       puts result_folder if $verbose
-      puts "mkdir #{result_folder}"
-      raise Extractors unless system "mkdir #{result_folder}"
+      puts "mkdir -f #{result_folder}"
+       system "mkdir  #{result_folder}"
 
       puts "Computing optimal clusters through #{k} base using #{c} algorithm"
       raise Exception unless exec_java("#{result_folder}/", c, k, v, $fuzzyfication, $error)
