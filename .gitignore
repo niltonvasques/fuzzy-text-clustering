@@ -11,3 +11,9 @@ parallel
 teste*
 *.in
 *.cluster*
+.RData
+.Rhistory
+*.frequencys
+*.terms
+*.pdf
+*.data

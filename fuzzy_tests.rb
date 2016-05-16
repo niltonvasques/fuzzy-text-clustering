@@ -268,7 +268,7 @@ def exec_java(result_folder, cluster, base, base_path, m_value, error_value)
            when "pfcm" 
              "-x"
            end
-  fuzzy_jar_cmd = ( "./clustering #{method} -o #{result_folder} -m #{m_value} -e #{error_value} -c #{$bases_class[base]} -r 5 -v  -a #{$pfcm_a} -b #{$pfcm_b} -n #{$fuzzyfication_n} #{$verbose_cmd} < #{base_path}" )
+  fuzzy_jar_cmd = ( "./clustering #{method} -o #{result_folder} -m #{m_value} -e #{error_value} -c #{$bases_class[base]} -r 5 -a #{$pfcm_a} -b #{$pfcm_b} -n #{$fuzzyfication_n} #{$verbose_cmd} < #{base_path}" )
 
   puts fuzzy_jar_cmd if $verbose
   system fuzzy_jar_cmd

@@ -157,8 +157,8 @@ int main(int argc, char *argv[]){
     ostringstream oss, oss2;
     oss << arguments.path << "memberships.matrix";
     oss2 << arguments.path << "tipicalities.matrix";
-    save_matrix(oss.str(), final_tipicalities, num_docs);
-    save_matrix(oss2.str(), final_memberships, num_docs);
+    save_matrix(oss2.str(), final_tipicalities, num_docs);
+    save_matrix(oss.str(), final_memberships, num_docs);
   }
   ostringstream oss;
   oss << arguments.path << "prototypes.matrix";
