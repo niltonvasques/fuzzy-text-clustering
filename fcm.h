@@ -7,6 +7,8 @@ static inline void compute_prototypes() {
 #pragma omp parallel for
   for (uint i = 0; i < num_docs; i++) {
     for (uint j = 0; j < num_clusters; j++) {
+      // Its required to use fabs because pow of negative numbers sometimes
+      // can result in NaN
       double tij = pow(fabs(memberships[i][j]), fuzziness);
       t[i][j] = tij;
     }

@@ -6,16 +6,17 @@ cosineDist <- function(x){
 drawCluster <- function(label, norm,  method, frequencys, sam){
   points <- as.data.frame(sam$points)
   filename = paste(method, "clusters", sep=".")
+  filename = paste(path, filename, sep="/")
   if(file.exists(filename)){
     clusters = read.table(filename)
-    clusters <- clusters[frequencys$id,]
+    clusters <- clusters[frequencys$id,] + 1
     points$class <- clusters
 
     print("Output image to output.pdf")
     pdf(file=paste(label, method, norm, "pdf", sep="."))
 
     print("Plot results")
-    plot(points$V1, points$V2, col=points$class)
+    plot(points$V1, points$V2, col=clusters)
     #text(points, labels = as.character(1:nrow(frequencys)))
     dev.off()
   }
@@ -33,6 +34,7 @@ applySammonMapping <- function(frequencys, distances, norm, label){
 args <- commandArgs(trailingOnly = TRUE)
 freq_filename <- args[1]
 title <- args[2]
+path <- args[3]
 
 print("Reading data")
 table = read.table(freq_filename)
