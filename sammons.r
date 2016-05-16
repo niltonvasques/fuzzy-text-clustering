@@ -17,8 +17,16 @@ drawCluster <- function(label, norm,  method, frequencys, sam){
 
     print("Plot results")
     plot(points$V1, points$V2, col=clusters)
-    #text(points, labels = as.character(1:nrow(frequencys)))
     dev.off()
+
+    # How to plot each cluster separated and respecting fuzzy partitions
+    #plot(table.sam$points, col=grey(1-m$V6), pch=16)
+    #plot(table.sam$points, col=grey(1-m$V1), pch=16)
+    #plot(table.sam$points, col=grey(1-m$V2), pch=16)
+    #plot(table.sam$points, col=grey(1-m$V3), pch=16)
+    #plot(table.sam$points, col=grey(1-m$V4), pch=16)
+    #m <- read.table("memberships.matrix")
+    #text(points, labels = as.character(1:nrow(frequencys)))
   }
 }
 

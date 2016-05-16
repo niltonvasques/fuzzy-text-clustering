@@ -84,8 +84,8 @@ $bases_path = "."
 $results_path = "/home/niltonvasques/Documents/ufba/tcc/results/results-c++-#{Time.now.to_s.gsub(/ |:|-/,"")}" 
 
 $bases = { 
-#  opinosis: "#{$bases_path}/opinosis.in",
-  newsgroup: "#{$bases_path}/20newsgroup.in",
+  opinosis: "#{$bases_path}/opinosis.in",
+#  newsgroup: "#{$bases_path}/20newsgroup.in",
 #  hitech: "#{$bases_path}/hitech.in",
 #  nsf: "#{$bases_path}/nsf.in",
 #  wap: "#{$bases_path}/wap.in",
