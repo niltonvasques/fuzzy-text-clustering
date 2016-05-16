@@ -68,9 +68,9 @@ static inline void save_arff(string fname, vector<SCORE> *descriptors){
     double max_degree = 0;
     uint g = 0;
     times(i, max_groups){
-      if(memberships[k][i] > max_degree){
+      if(final_memberships[k][i] > max_degree){
         g = i;
-        max_degree = memberships[k][i];
+        max_degree = final_memberships[k][i];
       }
       times(j, descriptors[i].size()){
         SCORE item = descriptors[i][j];
@@ -92,9 +92,9 @@ static inline void save_crisp(string fname, vector<SCORE> *descriptors){
     double max_degree = 0;
     uint g = 0;
     times(i, max_groups){
-      if(memberships[k][i] > max_degree){
+      if(final_memberships[k][i] > max_degree){
         g = i;
-        max_degree = memberships[k][i];
+        max_degree = final_memberships[k][i];
       }
     }
     fprintf(f, "%d\n",g);

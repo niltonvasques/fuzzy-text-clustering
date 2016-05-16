@@ -25,6 +25,7 @@ static struct argp_option options[] = {
   { "m", 'm', "VALUE", 0, "Set m fuzziness param. DEFAULT=1.2"},
   { "n", 'n', "VALUE", 0, "Set n fuzziness param. DEFAULT=1.2"},
   { "clusters", 'c', "VALUE", 0, "Set max clusters. DEFAULT=3"},
+  { "min-clusters", 'C', "VALUE", 0, "Set min clusters. DEFAULT=3"},
   { "cosine", 'k', 0, 0, "Set cosine norm. DEFAULT=euclidian"},
   { "euclidian", 'd', 0, 0, "Set euclidian norm. DEFAULT=euclidian"},
   { "random", 'r', "VALUE", 0, "Set random initials. DEFAULT=5"},
@@ -48,6 +49,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
     case 'm': arguments->m = atof(arg); break;
     case 'n': arguments->n = atof(arg); break;
     case 'c': arguments->c = atof(arg); break;
+    case 'C': arguments->min_clusters = atof(arg); break;
     case 'r': arguments->r = atof(arg); break;
     case 'd': arguments->norm = EUCLIDIAN; break;
     case 'k': arguments->norm = COSINE; break;
@@ -71,6 +73,7 @@ int main(int argc, char *argv[]){
   arguments.m = 1.2;
   arguments.n = 1.2;
   arguments.c = 3;
+  arguments.min_clusters = 2;
   arguments.r = 5;
   arguments.norm = EUCLIDIAN;
   string path = "";
@@ -114,9 +117,10 @@ int main(int argc, char *argv[]){
 
   double max_fs = -2;
   double fs;
+  uint min_clusters = arguments.min_clusters;
   max_groups = 2;
-  printf("find optimal cluster number from 2 to %d\n", max_clusters);
-  for(uint i = 2; i <= max_clusters; i++){
+  printf("find optimal cluster number from %d to %d\n", min_clusters, max_clusters);
+  for(uint i = min_clusters; i <= max_clusters; i++){
     printf("computing clustering with %d groups\n", i);
     num_clusters = i;
     times(j, random_initials){
@@ -137,7 +141,7 @@ int main(int argc, char *argv[]){
         if(arguments.mode == PFCM){
           store_final_tipicalities();
         }
-        //save_matrix("", final_memberships, num_docs);
+        save_matrix("", final_memberships, 3);
         //save_matrix("", final_tipicalities, num_docs);
         if(arguments.verbose) printf("max fs found: %lf aswc %d groups\n", fs, i);
       }

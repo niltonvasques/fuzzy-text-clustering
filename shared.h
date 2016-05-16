@@ -34,7 +34,8 @@ struct arguments {
   bool verbose;
   char *input;
   const char *path;
-  double a,b,m,n,c,r,epsilon;
+  double a,b,m,n,r,epsilon;
+  int c, min_clusters;
 };
 
 vector<string> terms;
