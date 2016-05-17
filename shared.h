@@ -184,6 +184,7 @@ static inline double get_new_value(uint i, uint j) {
         t = pow(t, p);
         sum += t;
     }
+	if(isnan(sum)) return 0;
     return 1.0 / sum;
 }
 

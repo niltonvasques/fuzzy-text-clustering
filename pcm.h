@@ -53,6 +53,7 @@ static inline double tipicality(double distance, uint j){
   double denominator = distance / gamas[j];
   double exp = 1.0 / (fuzziness - 1.0);
   denominator = 1.0 + pow(denominator, exp);
+  if(isnan(denominator)) return 0;
   return 1.0 / denominator;
 }
 
@@ -76,9 +77,9 @@ static inline double update_tipicalities() {
     for (j = 0; j < num_clusters; j++) {
       distance = get_norm(i, j, docs, prototypes);
       new_uij = tipicality(distance, j);
-      tik = pow(new_uij, fuzziness);
+      tik = pow(fabs(new_uij), fuzziness);
       sum_ic += tik * distance;
-      tik = pow(1 - new_uij, fuzziness);
+      tik = pow(fabs(1 - new_uij), fuzziness);
       sum_jn[j] += tik;
       memberships[i][j] = new_uij;
     }
