@@ -12,8 +12,10 @@ drawCluster <- function(label, norm,  method, frequencys, sam){
     clusters <- clusters[frequencys$id,] + 1
     points$class <- clusters
 
-    print("Output image to output.pdf")
-    pdf(file=paste(label, method, norm, "pdf", sep="."))
+    pdf_path <- paste(label, method, norm, "pdf", sep=".")
+    pdf_path <- paste(path, pdf_path, sep="/")
+    print(paste("Output image to", pdf_path, sep=" "))
+    pdf(file=pdf_path)
 
     print("Plot results")
     plot(points$V1, points$V2, col=clusters)
