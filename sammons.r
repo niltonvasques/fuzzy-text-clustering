@@ -10,7 +10,11 @@ drawCluster <- function(label, norm,  method, frequencys, sam){
   if(file.exists(filename)){
     clusters = read.table(filename)
     clusters <- clusters[frequencys$id,] + 1
-    points$class <- clusters
+    labels <- clusters
+    labels <- sort(unique(labels))
+    labels <- as.character(paste("crisp",labels))
+    n_labels <- length(labels)
+    print(labels)
 
     pdf_path <- paste(label, method, norm, "pdf", sep=".")
     pdf_path <- paste(path, pdf_path, sep="/")
@@ -18,7 +22,12 @@ drawCluster <- function(label, norm,  method, frequencys, sam){
     pdf(file=pdf_path)
 
     print("Plot results")
-    plot(points$V1, points$V2, col=clusters)
+    points <- (points-min(points))/(max(points)-min(points))
+    x <- points$V1
+    y <- points$V2
+    plot(x, y, col=rainbow(n_labels)[clusters], pch=19)
+    title(label)
+    legend('topright', labels, col=rainbow(n_labels), lty=1, bty='n', cex=.75)
     dev.off()
 
     # How to plot each cluster separated and respecting fuzzy partitions
@@ -45,6 +54,7 @@ args <- commandArgs(trailingOnly = TRUE)
 freq_filename <- args[1]
 title <- args[2]
 path <- args[3]
+print(title)
 
 print("Reading data")
 table = read.table(freq_filename)
