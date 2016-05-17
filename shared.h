@@ -199,20 +199,21 @@ static inline void debug_memberships(){
 
 static inline void generate_memberships(){
   double s,rval;
-  uint r;
+  uint range = ( RAND_MAX/(num_clusters+1) )+1;
   crisp.clear();
+  srand (time(NULL));
   for (uint i = 0; i < num_docs; i++) {
     s = 0.0;
-    r = 100000;
     crisp.pb(mp(0,1));
     memberships[i].clear();
-    for (uint j = 0; j < num_clusters-1; j++) {
-      rval = rand() % (r + 1);
-      r -= rval;
-      memberships[i].pb(rval / 100000.0);
+    for (uint j = 0; j < num_clusters; j++) {
+      rval = rand() % (range);
+      memberships[i].pb(rval);
       s += memberships[i][j];
     }
-    memberships[i].pb(1.0 - s);
+    for (uint j = 0; j < num_clusters; j++) {
+      memberships[i][j] /= s;
+    }
   }
 }
 
@@ -276,9 +277,9 @@ static inline double aswc(){
     double u2 = memberships[i][crisp[i].second];
     sum_up += s * (u1 - u2);
     sum_down += (u1 - u2);
-    if(arguments.verbose) 
-      printf("d%d: %lf beta %lf alpha %lf u1 %lf u2 %lf s %lf sumup %lf sumdown\n", i, beta,
-        alpha_g, u1, u2, s, sum_up, sum_down);
+    //if(arguments.verbose) 
+    //  printf("d%d: %lf beta %lf alpha %lf u1 %lf u2 %lf s %lf sumup %lf sumdown\n", i, beta,
+    //    alpha_g, u1, u2, s, sum_up, sum_down);
   }
   fs = sum_up / sum_down;
   return fs;

@@ -38,12 +38,12 @@ static inline void estimate_gamas() {
       double dij = get_norm(i, j, docs, prototypes); 
       double uij = memberships[i][j]; 
       uij = pow(fabs(uij), fuzziness);
-      //printf("dij %f uij %f\n", dij, uij);
+    //  printf("dij %f uij %f\n", dij, uij);
       numerator += uij * dij;
       denominator += uij;
     }
-    //printf("numerator %f denominator %f\n", numerator, denominator);
     gamas[j] = k * (numerator / denominator);
+    if(isnan(gamas[j])) exit(1);
     if(arguments.verbose) 
       printf("gamas[%d]: %f\n", j, gamas[j]);
   }
@@ -100,6 +100,9 @@ int pcm() {
   if(arguments.random){
     generate_memberships();
     init_prototypes();
+    pcm_compute_prototypes();
+    save_matrix("inital_memberships.matrix", memberships, num_docs);
+    save_matrix("inital_prototypes.matrix", prototypes, num_clusters);
   }else{
     fcm();
   }	
