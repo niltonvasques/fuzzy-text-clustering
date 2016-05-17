@@ -85,7 +85,7 @@ void init_tipicalities(){
     times(j, num_clusters){
       //double distance = get_norm(i, j); 
       //tipicalities[i].pb(pfcm_tipicality(distance, j));
-      tipicalities[i].pb(0);
+      tipicalities[i].pb(memberships[i][j]);
     }
   }
 }
@@ -96,9 +96,14 @@ int pfcm() {
 
   if(arguments.random){
     generate_memberships();
+    init_tipicalities();
     init_prototypes();
+    pfcm_compute_prototypes();
+    save_matrix("inital_memberships.matrix", memberships, num_docs);
+    save_matrix("inital_prototypes.matrix", prototypes, num_clusters);
   }else{
     fcm();
+    init_tipicalities();
   }	
 
   gamas.clear();
@@ -107,7 +112,6 @@ int pfcm() {
   }
   estimate_gamas();
   do {
-    init_tipicalities();
     pfcm_compute_prototypes();
     curr_j = pfcm_update_memberships_and_tipicalities();
     max_diff = fabs(curr_j - old_j);

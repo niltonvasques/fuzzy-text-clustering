@@ -58,35 +58,37 @@ static inline double tipicality(double distance, uint j){
 }
 
 static inline double update_tipicalities() {
-  uint i, j;
-  double new_uij;
-  double tik;
-  double sum_ic = 0;
   double sum_kn = 0;
   double sum_lc = 0;
   double sum_jn[num_clusters];
-  double distance;
 
 #pragma omp parallel for
-  for (j = 0; j < num_clusters; j++) {
+  for (uint j = 0; j < num_clusters; j++) {
     sum_jn[j] = 0;
   }
 
-  for (i = 0; i < num_docs; i++) {
-    sum_ic = 0;
-    for (j = 0; j < num_clusters; j++) {
+#pragma omp parallel for reduction(+:sum_kn)
+  for (uint j = 0; j < num_clusters; j++) {
+    double sum_ic = 0;
+    double sumjn = 0;
+    for (uint i = 0; i < num_docs; i++) {
+      double distance;
+      double new_uij;
+      double tik;
       distance = get_norm(i, j, docs, prototypes);
       new_uij = tipicality(distance, j);
       tik = pow(fabs(new_uij), fuzziness);
       sum_ic += tik * distance;
       tik = pow(fabs(1 - new_uij), fuzziness);
-      sum_jn[j] += tik;
+      sumjn += tik;
       memberships[i][j] = new_uij;
     }
     sum_kn += sum_ic;
+    sum_jn[j] = sumjn;
   }
 
-  for (j = 0; j < num_clusters; j++) {
+#pragma omp parallel for reduction(+:sum_lc)
+  for (uint j = 0; j < num_clusters; j++) {
     sum_lc += sum_jn[j] * gamas[j];
   }
 
