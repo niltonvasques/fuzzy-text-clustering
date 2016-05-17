@@ -36,22 +36,23 @@ static inline double pfcm_tipicality(double distance, uint j){
 }
 
 static inline double pfcm_update_memberships_and_tipicalities() {
-  uint i, j;
-  double new_uij;
-  double new_tik;
   double sum_kn = 0;
   double sum_lc = 0;
   double sum_jn[num_clusters];
-  double distance;
 
 #pragma omp parallel for
-  for (j = 0; j < num_clusters; j++) {
+  for (uint j = 0; j < num_clusters; j++) {
     sum_jn[j] = 0;
   }
 
-  for (i = 0; i < num_docs; i++) {
 #pragma omp parallel for reduction(+:sum_kn)
-    for (j = 0; j < num_clusters; j++) { 
+  for (uint j = 0; j < num_clusters; j++) { 
+    double sumjn = 0;
+    double in_sum_kn = 0;
+    for (uint i = 0; i < num_docs; i++) {
+      double new_uij;
+      double new_tik;
+      double distance;
       distance = get_norm(i, j, docs, prototypes); 
       new_uij = get_new_value(i, j);
       tipicalities[i][j] = pfcm_tipicality(distance, j);
@@ -61,14 +62,17 @@ static inline double pfcm_update_memberships_and_tipicalities() {
 
       new_uij = pow(new_uij, fuzziness_m);
 
-      sum_kn += (a * new_uij + b * pow(tipicalities[i][j], fuzziness_n)) * ( distance * distance );
+      in_sum_kn += (a * new_uij + b * pow(tipicalities[i][j], fuzziness_n)) * (
+          distance * distance );
       new_tik = pow(1 -tipicalities[i][j], fuzziness_n);
-      sum_jn[j] += new_tik;
+      sumjn += new_tik;
     }
+    sum_jn[j] = sumjn;
+    sum_kn += in_sum_kn;
   }
 
 #pragma omp parallel for reduction(+:sum_lc)
-  for (j = 0; j < num_clusters; j++) {
+  for (uint j = 0; j < num_clusters; j++) {
     sum_lc += sum_jn[j] * gamas[j];
   }
 
