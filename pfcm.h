@@ -5,21 +5,21 @@
 #include "fcm.h"
 
 static inline void pfcm_compute_prototypes() {
-  uint i, j, k;
-  double numerator, denominator;
-  vector<double> t[num_docs];
-  for (i = 0; i < num_docs; i++) {
-    for (j = 0; j < num_clusters; j++) {
+  double t[num_docs][num_clusters];
+#pragma omp parallel for
+  for (uint i = 0; i < num_docs; i++) {
+    for (uint j = 0; j < num_clusters; j++) {
       double result = a * pow(memberships[i][j], fuzziness_m) +
         b * pow(tipicalities[i][j], fuzziness_n);
-      t[i].pb(result);
+      t[i][j] = (result);
     }
   }
-  for (j = 0; j < num_clusters; j++) {
-    for (k = 0; k < num_terms; k++) {
-      numerator = 0.0;
-      denominator = 0.0;
-      for (i = 0; i < num_docs; i++) {
+#pragma omp parallel for collapse(2)
+  for (uint j = 0; j < num_clusters; j++) {
+    for (uint k = 0; k < num_terms; k++) {
+      double numerator = 0.0;
+      double denominator = 0.0;
+      for (uint i = 0; i < num_docs; i++) {
         numerator += t[i][j] * docs[i][k];
         denominator += t[i][j];
       }
@@ -44,11 +44,13 @@ static inline double pfcm_update_memberships_and_tipicalities() {
   double sum_jn[num_clusters];
   double distance;
 
+#pragma omp parallel for
   for (j = 0; j < num_clusters; j++) {
     sum_jn[j] = 0;
   }
 
   for (i = 0; i < num_docs; i++) {
+#pragma omp parallel for reduction(+:sum_kn)
     for (j = 0; j < num_clusters; j++) { 
       distance = get_norm(i, j, docs, prototypes); 
       new_uij = get_new_value(i, j);
@@ -65,6 +67,7 @@ static inline double pfcm_update_memberships_and_tipicalities() {
     }
   }
 
+#pragma omp parallel for reduction(+:sum_lc)
   for (j = 0; j < num_clusters; j++) {
     sum_lc += sum_jn[j] * gamas[j];
   }

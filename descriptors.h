@@ -276,6 +276,7 @@ static inline void mixed_pdcl(){
   double threshold = 1.0 / max_groups;
   pq_score ranking;
 
+#pragma omp parallel for
   times(i, num_docs){
     double sum = 0;
     times(j, max_groups){
