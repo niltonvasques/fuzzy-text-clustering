@@ -37,7 +37,7 @@ static inline void estimate_gamas() {
     for (uint i = 0; i < num_docs; i++) {
       double dij = get_norm(i, j, docs, prototypes); 
       double uij = memberships[i][j]; 
-      uij = pow(uij, fuzziness);
+      uij = pow(fabs(uij), fuzziness);
       //printf("dij %f uij %f\n", dij, uij);
       numerator += uij * dij;
       denominator += uij;
