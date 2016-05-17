@@ -87,7 +87,7 @@ int main(int argc, char *argv[]){
   argp_parse(&argp, argc, argv, 0, 0, &arguments);
 
   a = arguments.a;
-  b = arguments.a;
+  b = arguments.b;
   fuzziness = fuzziness_m = arguments.m;
   fuzziness_n = arguments.n;
   uint max_clusters = arguments.c;
@@ -164,11 +164,11 @@ int main(int argc, char *argv[]){
     oss << arguments.path << "memberships.matrix";
     save_matrix(oss.str(), final_memberships, num_docs);
   }else if(arguments.mode == PFCM){
-    ostringstream oss, oss2;
+    ostringstream oss, oss2, oss3;
     oss << arguments.path << "memberships.matrix";
     oss2 << arguments.path << "tipicalities.matrix";
-    save_matrix(oss2.str(), final_tipicalities, num_docs);
     save_matrix(oss.str(), final_memberships, num_docs);
+    save_matrix(oss2.str(), final_tipicalities, num_docs);
   }
   ostringstream oss;
   oss << arguments.path << "prototypes.matrix";
@@ -183,6 +183,9 @@ int main(int argc, char *argv[]){
   }else if(arguments.mode == PFCM){
     soft_fdcl();
     mixed_pdcl();
+    ostringstream oss;
+    oss << arguments.path << "merged.matrix";
+    save_matrix(oss.str(), merged, num_docs);
   }
 
   printf ("the clustering process has finished\n");

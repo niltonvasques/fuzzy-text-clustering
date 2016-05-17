@@ -15,6 +15,7 @@ drawCluster <- function(label, norm,  method, frequencys, sam){
   points <- as.data.frame(sam$points)
   filename = paste(method, "clusters", sep=".")
   filename = paste(path, filename, sep="/")
+  print(paste("Check existance of ",filename))
   if(file.exists(filename)){
     clusters = read.table(filename)
     clusters <- clusters[frequencys$id,] + 1

@@ -43,7 +43,7 @@ static inline void save_ranking(string fname, vector<SCORE> &ranking){
   fclose(f);
 }
 
-static inline void save_arff(string fname, vector<SCORE> *descriptors){
+static inline void save_arff(string fname, vector<SCORE> *descriptors, vector<double> *degrees){
   FILE *f;
   if ((f = fopen(fname.c_str(), "w")) == NULL) {
     printf("Cannot create output file.\n");
@@ -68,9 +68,10 @@ static inline void save_arff(string fname, vector<SCORE> *descriptors){
     double max_degree = 0;
     uint g = 0;
     times(i, max_groups){
-      if(final_memberships[k][i] > max_degree){
+      double degree = degrees[k][i];
+      if(degree> max_degree){
         g = i;
-        max_degree = final_memberships[k][i];
+        max_degree = degree;
       }
       times(j, descriptors[i].size()){
         SCORE item = descriptors[i][j];
@@ -82,7 +83,7 @@ static inline void save_arff(string fname, vector<SCORE> *descriptors){
   fclose(f);
 }
 
-static inline void save_crisp(string fname, vector<SCORE> *descriptors){
+static inline void save_crisp(string fname, vector<SCORE> *descriptors, vector<double> *degrees){
   FILE *f;
   if ((f = fopen(fname.c_str(), "w")) == NULL) {
     printf("Cannot create output file.\n");
@@ -92,9 +93,9 @@ static inline void save_crisp(string fname, vector<SCORE> *descriptors){
     double max_degree = 0;
     uint g = 0;
     times(i, max_groups){
-      if(final_memberships[k][i] > max_degree){
+      if(degrees[k][i] > max_degree){
         g = i;
-        max_degree = final_memberships[k][i];
+        max_degree = degrees[k][i];
       }
     }
     fprintf(f, "%d\n",g);
@@ -175,10 +176,10 @@ static inline void soft_fdcl(){
   }
   ostringstream oss, oss2;
   oss << arguments.path << "clusters.soft-fdcl.arff";
-  save_arff(oss.str(), descriptors);
+  save_arff(oss.str(), descriptors, final_memberships);
 
   oss2 << arguments.path << "soft-fdcl.clusters";
-  save_crisp(oss2.str(), descriptors);
+  save_crisp(oss2.str(), descriptors, final_memberships);
 }
 
 
@@ -266,16 +267,15 @@ static inline void pdcl(){
   }
   ostringstream oss,oss2;
   oss << arguments.path << "clusters.pdcl.arff";
-  save_arff(oss.str(), descriptors);
+  save_arff(oss.str(), descriptors, normalized);
   oss2 << arguments.path << "pdcl.clusters";
-  save_crisp(oss2.str(), descriptors);
+  save_crisp(oss2.str(), descriptors, normalized);
 }
 
 static inline void mixed_pdcl(){
   double threshold = 1.0 / max_groups;
   pq_score ranking;
 
-  vector<double> merged[num_docs];
   times(i, num_docs){
     double sum = 0;
     times(j, max_groups){
@@ -283,7 +283,7 @@ static inline void mixed_pdcl(){
     }
     times(j, max_groups){
       double t_degree = final_tipicalities[i][j]/sum;
-      double m_degree = final_memberships[i][j]/sum;
+      double m_degree = final_memberships[i][j];
       merged[i].pb(( a * m_degree + b * t_degree )/(a+b)); 
     }
   }
@@ -357,9 +357,9 @@ static inline void mixed_pdcl(){
   }
   ostringstream oss,oss2;
   oss << arguments.path << "clusters.mixed-pdcl.arff";
-  save_arff(oss.str(), descriptors);
+  save_arff(oss.str(), descriptors, merged);
   oss2 << arguments.path << "mixed-pdcl.clusters";
-  save_crisp(oss2.str(), descriptors);
+  save_crisp(oss2.str(), descriptors, merged);
 }
 
 #endif
