@@ -31,6 +31,7 @@ static struct argp_option options[] = {
   { "random", 'r', "VALUE", 0, "Set random initials. DEFAULT=5"},
   { "output", 'o', "PATH", 0, "Set output path. DEFAULT=./"},
   { "epsilon", 'e', "VALUE", 0, "Set epsilon. DEFAULT=0.01"},
+  { "partition", 'F', 0, 0, "First partition comes from fcm. DEFAULT=random"},
   { 0 } 
 };
 
@@ -44,6 +45,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
     case 'i': arguments->input = arg; break;
     case 'o': arguments->path = arg; break;
     case 'v': arguments->verbose = true; break;
+    case 'F': arguments->random = false; break;
     case 'a': arguments->a = atof(arg); break;
     case 'b': arguments->b = atof(arg); break;
     case 'm': arguments->m = atof(arg); break;
@@ -76,6 +78,7 @@ int main(int argc, char *argv[]){
   arguments.min_clusters = 2;
   arguments.r = 5;
   arguments.norm = EUCLIDIAN;
+  arguments.random = true;
   string path = "";
   arguments.path = path.c_str();
 

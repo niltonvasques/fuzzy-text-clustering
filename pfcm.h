@@ -87,7 +87,13 @@ int pfcm() {
   double max_diff;
   double curr_j = 0, old_j = 0;
 
-  fcm();
+  if(arguments.random){
+    generate_memberships();
+    init_prototypes();
+  }else{
+    fcm();
+  }	
+
   gamas.clear();
   times(i, num_clusters){
     gamas.pb(0);

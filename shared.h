@@ -32,6 +32,7 @@ struct arguments {
   METHOD mode;
   NORM norm;
   bool verbose;
+  bool random;
   char *input;
   const char *path;
   double a,b,m,n,r,epsilon;

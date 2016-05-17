@@ -76,20 +76,18 @@
 #  * Weka tool
 #!/bin/env/ruby ruby
 
-require 'terminal/progressbar'
-
 $start_time = Time.now
 
 $bases_path = "." 
-$results_path = "/home/niltonvasques/Documents/ufba/tcc/results/results-c++-#{Time.now.to_s.gsub(/ |:|-/,"")}" 
+$results_path = "results" 
 
 $bases = { 
   opinosis: "#{$bases_path}/opinosis.in",
-#  newsgroup: "#{$bases_path}/20newsgroup.in",
-#  hitech: "#{$bases_path}/hitech.in",
-#  nsf: "#{$bases_path}/nsf.in",
-#  wap: "#{$bases_path}/wap.in",
-  #reuters: "#{$bases_path}/reuters.in", 
+  newsgroup: "#{$bases_path}/20newsgroup.in",
+  hitech: "#{$bases_path}/hitech.in",
+  nsf: "#{$bases_path}/nsf.in",
+  wap: "#{$bases_path}/wap.in",
+  reuters: "#{$bases_path}/reuters.in", 
 }
 
 $bases_class = { 
@@ -145,7 +143,7 @@ unless ARGV.empty?
   $error = ARGV[arg_hash["--error"]+1].to_f if ARGV.include? "--error"
   $weka_path = ARGV[arg_hash["--weka-path"]+1] if ARGV.include? "--weka-path"
   timestamp = ARGV[arg_hash["--timestamp"]+1] if ARGV.include? "--timestamp"
-  $results_path = "/home/niltonvasques/Documents/ufba/tcc/results/results-c++-#{timestamp}" 
+  $results_path = "results" 
   $mixed_descriptors = "-mixed-desc" if  $pfcm_descriptors.include? "mixed"
   $tipicality_descriptors = "-tip-desc" if  $pfcm_descriptors.include? "tipicality"
   $membership_descriptors = "-memb-desc" if  $pfcm_descriptors.include? "membership"

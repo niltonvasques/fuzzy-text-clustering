@@ -95,8 +95,14 @@ static inline double update_tipicalities() {
 int pcm() {
   double max_diff;
   double curr_j = 0, old_j = 0;
+  
+  if(arguments.random){
+    generate_memberships();
+    init_prototypes();
+  }else{
+    fcm();
+  }	
 
-  fcm();
   gamas.clear();
   times(i, num_clusters){
     gamas.pb(0);
