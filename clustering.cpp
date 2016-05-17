@@ -28,6 +28,7 @@ static struct argp_option options[] = {
   { "min-clusters", 'C', "VALUE", 0, "Set min clusters. DEFAULT=3"},
   { "cosine", 'k', 0, 0, "Set cosine norm. DEFAULT=euclidian"},
   { "euclidian", 'd', 0, 0, "Set euclidian norm. DEFAULT=euclidian"},
+  { "jaccard", 'j', 0, 0, "Set jaccard norm. DEFAULT=euclidian"},
   { "random", 'r', "VALUE", 0, "Set random initials. DEFAULT=5"},
   { "output", 'o', "PATH", 0, "Set output path. DEFAULT=./"},
   { "epsilon", 'e', "VALUE", 0, "Set epsilon. DEFAULT=0.01"},
@@ -55,6 +56,7 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
     case 'r': arguments->r = atof(arg); break;
     case 'd': arguments->norm = EUCLIDIAN; break;
     case 'k': arguments->norm = COSINE; break;
+    case 'j': arguments->norm = JACCARD; break;
     case 'e': arguments->epsilon = atof(arg); break;
     case ARGP_KEY_ARG: return 0;
     default: return ARGP_ERR_UNKNOWN;
@@ -107,6 +109,7 @@ int main(int argc, char *argv[]){
   string norm = "euclidian";
   string method = "fcm";
   if(arguments.norm == COSINE) norm = "cosine";
+  if(arguments.norm == JACCARD) norm = "jaccard";
   if(arguments.mode == PCM) method = "pcm";
   if(arguments.mode == PFCM) method = "pfcm";
   printf ("parameters:\n");

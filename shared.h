@@ -27,7 +27,7 @@
 using namespace std;
 
 enum METHOD { FCM, PCM, PFCM };
-enum NORM { EUCLIDIAN, COSINE };
+enum NORM { EUCLIDIAN, COSINE, JACCARD };
 struct arguments {
   METHOD mode;
   NORM norm;
@@ -154,11 +154,21 @@ static inline double cosine_norm(uint i, uint j, vector<double> *x, vector<doubl
     return 1 - ( numerator / ( sqrt(inner_x) * sqrt(inner_y) ));
 }
 
+static inline double jaccard_norm(uint i, uint j, vector<double> *x, vector<double> *y){
+    double numerator = inner_product(i, j, x, y);
+    if(numerator == 0) return 1;
+    double inner_x = inner_product(i, i, x, x);
+    double inner_y = inner_product(j, j, y, y);
+    return 1 - ( numerator / ( inner_x + inner_y - numerator ));
+}
+
 static inline double get_norm(uint i, uint j, vector<double> *x, vector<double> *y){
   if(arguments.norm == EUCLIDIAN)
     return euclidian_norm(i, j, x, y);
   if(arguments.norm == COSINE)
     return cosine_norm(i, j, x, y);
+  if(arguments.norm == JACCARD)
+    return jaccard_norm(i, j, x, y);
   return -1;
 }
 
