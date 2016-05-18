@@ -29,7 +29,7 @@ static inline void pfcm_compute_prototypes() {
 }
 
 static inline double pfcm_tipicality(double distance, uint j){
-  double denominator = distance / gamas[j];
+  double denominator = pow(distance,2) * (b/gamas[j]);
   double exp = 1.0 / (fuzziness_n - 1.0);
   denominator = 1.0 + pow(denominator, exp);
   return 1.0 / denominator;
@@ -104,6 +104,7 @@ int pfcm() {
   }else{
     fcm();
     init_tipicalities();
+    pfcm_compute_prototypes();
   }	
 
   gamas.clear();

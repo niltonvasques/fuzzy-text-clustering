@@ -52,7 +52,12 @@ drawCluster <- function(label, norm,  method, frequencys, sam){
 
 applySammonMapping <- function(frequencys, distances, norm, label){
   print("Performing matrix reduction with sammons mapping")
-  sam <- sammon(distances)
+  sam <- as.data.frame(frequencys)
+  if(ncol(frequencys) == 3){
+    sam$points <- sam
+  }else{
+    sam <- sammon(distances)
+  }
 
   drawCluster(label, norm, "soft-fdcl", frequencys, sam)
   drawCluster(label, norm, "mixed-pdcl", frequencys, sam)
@@ -73,16 +78,23 @@ table$id <- c(1:nrow(table))
 print("Checking for duplicates")
 table <- table[!duplicated(table[,c(1:ncol(table)-1)]), ]
 
-print("Computing all distances with cosine measure")
-d = cosineDist(as.matrix(table))
-applySammonMapping(table, d, "cosine", title)
+print(paste("The data has ", ncol(table), "dimensions"))
 
-print("Computing all distances with jaccard measure")
-d = jacardDist(as.matrix(table))
-applySammonMapping(table, d, "jaccard", title)
+if(ncol(table) == 3){
+  print("Show results")
+  applySammonMapping(table, 0, "euclidian", title)
+}else{
+  print("Computing all distances with cosine measure")
+  d = cosineDist(as.matrix(table))
+  applySammonMapping(table, d, "cosine", title)
+  
+  print("Computing all distances with jaccard measure")
+  d = jacardDist(as.matrix(table))
+  applySammonMapping(table, d, "jaccard", title)
 
-print("Computing all distances with euclidian measure")
-d = dist(as.matrix(table))
-applySammonMapping(table, d, "euclidian", title)
+  print("Computing all distances with euclidian measure")
+  d = dist(as.matrix(table))
+  applySammonMapping(table, d, "euclidian", title)
+}
 
 print("Process finished")

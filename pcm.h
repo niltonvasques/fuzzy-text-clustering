@@ -50,7 +50,7 @@ static inline void estimate_gamas() {
 }
 
 static inline double tipicality(double distance, uint j){
-  double denominator = distance / gamas[j];
+  double denominator = pow(distance,2) / gamas[j];
   double exp = 1.0 / (fuzziness - 1.0);
   denominator = 1.0 + pow(denominator, exp);
   if(isnan(denominator)) return 0;
@@ -95,25 +95,38 @@ static inline double update_tipicalities() {
   return sum_kn + sum_lc;
 }
 
-int pcm() {
-  double max_diff;
-  double curr_j = 0, old_j = 0;
-  
-  if(arguments.random){
-    generate_memberships();
-    init_prototypes();
-    pcm_compute_prototypes();
-    save_matrix("inital_memberships.matrix", memberships, num_docs);
-    save_matrix("inital_prototypes.matrix", prototypes, num_clusters);
-  }else{
-    fcm();
-  }	
+static inline void default_prototypes(){
+  prototypes[0].pb(-3.34);
+  prototypes[0].pb(1.67);
+  prototypes[1].pb(1.67);
+  prototypes[1].pb(0.00);
+}
 
+static inline void init_gamas(){
   gamas.clear();
   times(i, num_clusters){
     gamas.pb(0);
   }
+}
+
+int pcm() {
+  double max_diff;
+  double curr_j = 0, old_j = 0;
+
+  init_gamas();
+  
+  if(arguments.random){
+    //default_prototypes();
+    generate_memberships();
+    init_prototypes();
+    pcm_compute_prototypes();
+  }else{
+    fcm();
+  }	
+  save_matrix("initial_memberships.matrix", memberships, num_docs);
+  save_matrix("initial_prototypes.matrix", prototypes, num_clusters);
   estimate_gamas();
+  old_j = update_tipicalities();
   do {
     pcm_compute_prototypes();
     curr_j = update_tipicalities();
