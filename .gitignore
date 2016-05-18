@@ -17,3 +17,9 @@ teste*
 *.terms
 *.pdf
 *.data
+ou
+params.report
+report
+results.aux
+results.log
+out
