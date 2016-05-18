@@ -36,7 +36,8 @@ struct arguments {
   char *input;
   const char *path;
   double a,b,m,n,r,epsilon;
-  int c, min_clusters;
+  double min_m, min_n;
+  int c, min_clusters, sampling;
 };
 
 vector<string> terms;
@@ -89,6 +90,26 @@ extern struct arguments arguments;
 
 #endif
 
+static inline map<uint,bool> sampling(uint n, uint m){
+  //C++-ish pseudocode
+  vector<uint> arr(n);
+  map<uint,bool> sample;
+  for(uint i = 0; i < n; ++i){
+    arr[i] = i;
+    sample[i] = ( m == 0 );
+  }
+
+  srand (time(NULL));
+  for(uint i = 0; i < m; ++i){
+    uint tmp = arr[n-i];
+    uint pos = rand()%(n-i);
+    arr[n-i] = arr[pos];
+    arr[pos] = tmp;
+    sample[arr[n-i]] = true;
+  }
+  return sample;
+}
+
 static inline void read_data(){
 
   string line;
@@ -101,14 +122,27 @@ static inline void read_data(){
     //DEBUG_LOG(line);
   }
 
+  map<uint,bool> sample = sampling(num_docs, arguments.sampling);
+
+  uint doc = 0;
+  printf("Sampling %d from %d\n", arguments.sampling, num_docs);
   times(i, num_docs){
     double frequency; 
     times(j, num_terms){
       cin >> frequency; 
-      docs[i].pb(frequency);
+      if(sample[i]){
+        docs[doc].pb(frequency);
+      }
+    }
+    if(sample[i]){
+      printf("%d,", i);
+      doc++;
     }
   }
+  printf("\n");
+  if(arguments.sampling > 0) num_docs = arguments.sampling;
 }
+
 
 static inline void save_matrix(string fname, vector<double> *matrix, uint size) {
     uint i, j;
