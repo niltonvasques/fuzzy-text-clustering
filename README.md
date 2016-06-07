@@ -7,7 +7,7 @@ A tool for perform text clustering and cluster labelling.
 * Clustering methods (FCM, PCM, PFCM) 
 * Distance norms (Euclidian, Cosine, Jaccard)
 * Cluster labelling/Descriptor extractor methods (SoftO-FDCL, PDCL, Mixed-PFDCL)
-* Generate ARFF file after process ready for classification benchmarks in WEKA tool
+* Generate ARFF file after process, thus its possible just submit for classification benchmarks in WEKA tool
 * Parameters selection
 * Input data should be in programming contest problems format
 
