@@ -43,7 +43,7 @@ Executing process
     ...
     valueM1 valueM2 ... valueMN
     
-#### Ploting results with Sammons Mapping
+#### Ploting results with Sammon's Mapping
 
     Rscript sammons.r samples/X12.frequencys X12 .
     
