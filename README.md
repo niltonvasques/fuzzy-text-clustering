@@ -42,3 +42,9 @@ Executing process
     value21 value22 ... value2N
     ...
     valueM1 valueM2 ... valueMN
+    
+#### Ploting results with Sammons Mapping
+
+    Rscript sammons.r samples/X12.frequencys X12 .
+    
+![X12 clustered](https://github.com/niltonvasques/fuzzy-text-clustering/blob/master/samples/X12.png)
