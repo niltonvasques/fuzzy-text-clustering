@@ -29,8 +29,8 @@ Executing process
 
 #### Input format
 
-*N* is the number of terms 
-*M* is the number of documents
+**N** is the number of terms<br> 
+**M** is the number of documents
 
 
     N M
